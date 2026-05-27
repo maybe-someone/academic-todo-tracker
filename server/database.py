@@ -14,6 +14,7 @@ def init_db():
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		login TEXT,
 		task TEXT,
+		complete TEXT,
 		deadline TEXT,
 		FOREIGN KEY (login) REFERENCES users (login)
 	)""")
@@ -44,9 +45,33 @@ def remover_task_db(id):
 	conn.commit()
 	conn.close()
 
+#updater of tasks
+def upd_task_db(id, task, deadline, complete):
+	conn = sq.connect('usersAndTasks.db')
+	cursor = conn.cursor()
+
+	cursor.execute("""UPDATE tasks SET
+		task = ?,
+		deadline = ?,
+		complete = ?
+		WHERE id = ?
+	""", (task, deadline, complete, id))
+	
+	conn.commit()
+	conn.close()
+
+
+
+
 if __name__ == '__main__':
 	init_db()
 	print("Database is initialized successfully")
 	
 	all_task = select_task_db()
 	print("Select task is worked seccessfully. Task:", all_task)
+	
+	remover_task_db()
+	print("Remover is OK")
+	
+	upd_task_db()
+	print("Updater is OK")
