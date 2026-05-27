@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from database import *
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
+from schemas import
+
+
+
 
 @asynccontextmanager
 asenc def lifespan(app: FastAPI):
@@ -10,8 +14,11 @@ asenc def lifespan(app: FastAPI):
 	pass
 
 
-
-
+@app.post("/register")
+def user_reg(user: UserLogin):
+	name = user.login
+	password = user.password
+	add_user_db(name, password)
 
 app = FastAPI()
 

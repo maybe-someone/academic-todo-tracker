@@ -36,6 +36,18 @@ def select_task_db(login):
 	
 	return all_tasks
 
+#func for select in user's database
+def select_user_db(login):
+        conn = sq.connect('usersAndTasks.db')
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON")
+
+        cursor.execute("SELECT * FROM users WHERE login = ?", (login,))
+
+        user = cursor.fetchall()
+        conn.close()
+
+        return user
 
 #remove complete a task in databse
 def remover_task_db(id):
