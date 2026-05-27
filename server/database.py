@@ -4,6 +4,7 @@ import sqlite3 as sq
 def init_db():
 	conn = sq.connect('usersAndTasks.db')	
 	cursor = conn.cursor()
+	cursor.execute("PRAGMA foreign_keys = ON")
 	
 	cursor.execute("""CREATE TABLE IF NOT EXISTS users (
 		login TEXT PRIMARY KEY,
@@ -14,11 +15,11 @@ def init_db():
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		login TEXT,
 		task TEXT,
-		complete TEXT,
 		deadline TEXT,
+		complete INTEGER,
 		FOREIGN KEY (login) REFERENCES users (login)
 	)""")
-
+	
 	conn.commit()
 	conn.close()
 
@@ -26,6 +27,7 @@ def init_db():
 def select_task_db(login):
 	conn = sq.connect('usersAndTasks.db')
 	cursor = conn.cursor()
+	cursor.execute("PRAGMA foreign_keys = ON")
 	
 	cursor.execute("SELECT * FROM tasks WHERE login = ?", (login,))
 	
@@ -39,6 +41,7 @@ def select_task_db(login):
 def remover_task_db(id):
 	conn = sq.connect('usersAndTasks.db')
 	cursor = conn.cursor()
+	cursor.execute("PRAGMA foreign_keys = ON")
 	
 	cursor.execute("DELETE FROM tasks WHERE id = ?", (id,))
 	
@@ -49,7 +52,8 @@ def remover_task_db(id):
 def upd_task_db(id, task, deadline, complete):
 	conn = sq.connect('usersAndTasks.db')
 	cursor = conn.cursor()
-
+	cursor.execute("PRAGMA foreign_keys = ON")
+	
 	cursor.execute("""UPDATE tasks SET
 		task = ?,
 		deadline = ?,
@@ -60,7 +64,37 @@ def upd_task_db(id, task, deadline, complete):
 	conn.commit()
 	conn.close()
 
+#adder of tasks
+def add_task_db(login, task, deadline, complete=0):
+	conn = sq.connect('usersAndTasks.db')
+	cursor = conn.cursor()
+	cursor.execute("PRAGMA foreign_keys = ON")
+	
+	cursor.execute("""INSERT INTO tasks(
+		login,
+		task,
+		deadline,
+		complete
+		) VALUES (?, ?, ?, ?)""",
+	(login, task, deadline, complete))
+	
+	conn.commit()
+	conn.close()
 
+#adder of users
+def add_user_db(login, password_hash):
+        conn = sq.connect('usersAndTasks.db')
+        cursor = conn.cursor()
+	cursor.execute("PRAGMA foreign_keys = ON")
+	
+        cursor.execute("""INSERT INTO users(
+                login,
+                password_hash
+                ) VALUES (?, ?)""",
+        (login, password_hash))
+	
+        conn.commit()
+        conn.close()
 
 
 if __name__ == '__main__':
