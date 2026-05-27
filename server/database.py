@@ -83,29 +83,15 @@ def add_task_db(login, task, deadline, complete=0):
 
 #adder of users
 def add_user_db(login, password_hash):
-        conn = sq.connect('usersAndTasks.db')
-        cursor = conn.cursor()
+	conn = sq.connect('usersAndTasks.db')
+	cursor = conn.cursor()
 	cursor.execute("PRAGMA foreign_keys = ON")
 	
-        cursor.execute("""INSERT INTO users(
-                login,
-                password_hash
-                ) VALUES (?, ?)""",
-        (login, password_hash))
+	cursor.execute("""INSERT INTO users(
+		login,
+		password_hash
+		) VALUES (?, ?)""",
+	(login, password_hash))
 	
-        conn.commit()
-        conn.close()
-
-
-if __name__ == '__main__':
-	init_db()
-	print("Database is initialized successfully")
-	
-	all_task = select_task_db()
-	print("Select task is worked seccessfully. Task:", all_task)
-	
-	remover_task_db()
-	print("Remover is OK")
-	
-	upd_task_db()
-	print("Updater is OK")
+	conn.commit()
+	conn.close()
