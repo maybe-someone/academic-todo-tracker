@@ -24,17 +24,30 @@ def init_db():
 	conn.close()
 
 #func for select in task's database
-def select_task_db(login):
+def select_task_db(id):
+	conn = sq.connect('usersAndTasks.db')
+	cursor = conn.cursor()
+	cursor.execute("PRAGMA foreign_keys = ON")
+	
+	cursor.execute("SELECT * FROM tasks WHERE id = ?", (id,))
+	
+	task = cursor.fetchone()
+	conn.close()
+	
+	return task
+
+#func for select in task's database
+def select_tasks_db(login):
 	conn = sq.connect('usersAndTasks.db')
 	cursor = conn.cursor()
 	cursor.execute("PRAGMA foreign_keys = ON")
 	
 	cursor.execute("SELECT * FROM tasks WHERE login = ?", (login,))
 	
-	all_tasks = cursor.fetchall()
+	all_task = cursor.fetchall()
 	conn.close()
 	
-	return all_tasks
+	return all_task
 
 #func for select in user's database
 def select_user_db(login):
@@ -44,7 +57,7 @@ def select_user_db(login):
 
         cursor.execute("SELECT * FROM users WHERE login = ?", (login,))
 
-        user = cursor.fetchall()
+        user = cursor.fetchone()
         conn.close()
 
         return user

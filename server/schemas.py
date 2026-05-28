@@ -8,9 +8,12 @@ class CreateTask(BaseModel):
 	task: str
 	deadline: str
 	complete: bool=False
+	token: str
+	
 
 class UpdateTask(BaseModel):
 	id: int
 	task: str
 	deadline: str
 	complete: bool
+	token: str
