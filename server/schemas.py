@@ -8,7 +8,6 @@ class CreateTask(BaseModel):
 	task: str
 	deadline: str
 	complete: bool=False
-	token: str
 	
 
 class UpdateTask(BaseModel):
@@ -16,4 +15,3 @@ class UpdateTask(BaseModel):
 	task: str
 	deadline: str
 	complete: bool
-	token: str

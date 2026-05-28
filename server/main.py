@@ -1,25 +1,26 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from database import *
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
-from schemas import UserLogin, CreateTask, UpdateTask, AllTasks
+from schemas import UserLogin, CreateTask, UpdateTask
 from auth import user_reg, user_auth, access, user_token_create
-
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 	init_db()
 	yield
-		pass
+	pass
 
 app = FastAPI(lifespan = lifespan)
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 @app.post("/register", status_code=status.HTTP_201_CREATED)
-def reg_user(user: UserLogin):
-	if user_reg(user.login, user.password):
-		return {"status": "Registration completed!", "token": user_token_create(user.login)}
+def reg_user(username: UserLogin):
+	if user_reg(username.login, username.password):
+		return {"status": "Registration completed!", "token": user_token_create(username.login)}
 	else:
 		raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -27,9 +28,9 @@ def reg_user(user: UserLogin):
         )
 
 @app.post("/login")
-def login_user(user: UserLogin):
-	if user_auth(user.login, user.password):
-		return {"status": "Successful login!", "token": user_token_create(user.login)}
+def login_user(user: OAuth2PasswordRequestForm = Depends()):
+	if user_auth(user.username, user.password):
+		return {"status": "Successful login!", "access_token": user_token_create(user.username), "token_type": "bearer"}
 	else:
 		raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -37,8 +38,8 @@ def login_user(user: UserLogin):
         )
 
 @app.post("/tasks/add", status_code=status.HTTP_201_CREATED)
-def task_add(user: CreateTask):
-	token_owner = access(user.token)
+def task_add(user: CreateTask, token: str = Depends(oauth2_scheme)):
+	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -59,7 +60,7 @@ def task_add(user: CreateTask):
         )
 
 @app.delete("/tasks/remove")
-def remove_task(id: int, token: str):
+def remove_task(id: int, token: str = Depends(oauth2_scheme)):
 	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
@@ -87,8 +88,8 @@ def remove_task(id: int, token: str):
 
 
 @app.put("/tasks/update")
-def update_task(task: UpdateTask):
-	token_owner = access(task.token)
+def update_task(task: UpdateTask, token: str = Depends(oauth2_scheme)):
+	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -106,14 +107,14 @@ def update_task(task: UpdateTask):
 	if token_owner != tasks[1]:
 		raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to delete this task."
+            detail="You do not have permission to update this task."
         )
 
 	upd_task_db(task.id, task.task, task.deadline, task.complete)
 	return {"task": "Task update successfully!"}
 
 @app.get("/tasks")
-def get_tasks(token: str):
+def get_tasks(token: str = Depends(oauth2_scheme)):
 	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
