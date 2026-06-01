@@ -14,8 +14,7 @@
 #endif
 
 
-Actions::Actions() {}
-
+Actions::Actions () {};
 
 namespace {
 	void delimiter(int count = 20) {
@@ -48,9 +47,12 @@ namespace {
 		return text;
 	}
 
-	bool id_check(const std::vector<ActionWithServer::Variable>& tasks, int id) {
-		return id < 1 && static_cast<size_t>(id - 1) >= tasks.size();
+bool id_check(const std::vector<ActionWithServer::Variable>& tasks, int id) {
+	if (id < 1 || static_cast<size_t>(id - 1) >= tasks.size()) {
+		return false;
 	}
+	return true;
+}
 
 	std::string get_password() {
 		std::string password;
