@@ -4,7 +4,7 @@
 #include <string>
 
 int main() {
-	httplib::Client cli("http://127.0.0.1:8000");
+	httplib::Client cli("http://89.22.235.108:8000");
 	
 	Actions actions;
 	httplib::Headers headers;
