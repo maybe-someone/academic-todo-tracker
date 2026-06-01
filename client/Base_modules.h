@@ -12,15 +12,13 @@ class Actions {
     public:
         Actions();
         
-        std::string get_password();
+
         httplib::Headers user_reg(httplib::Client& cli);
-        void delimiter(int count = 20);
         httplib::Headers user_login(httplib::Client& cli);
-        void task_delete(httplib::Client& cli, httplib::Headers headers);
-        std::string lower(std::string text);
-        bool id_check(const std::vector<ActionWithServer::Variable>& tasks, int id);
         void print_tasks(const std::vector<ActionWithServer::Variable>& tasks);
-    
+        void task_add(httplib::Client& cli, httplib::Headers headers);
+        void task_delete(httplib::Client& cli, httplib::Headers headers);
+        void task_upd(httplib::Client& cli, httplib::Headers headers);
     };
 
 #endif

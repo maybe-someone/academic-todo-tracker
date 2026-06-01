@@ -31,18 +31,15 @@ public:
         httplib::Headers headers,
         int id);
 
-    void add_task(httplib::Client& cli,
+    bool add_task(httplib::Client& cli,
         httplib::Headers headers,
-        int id,
-        std::string login,
         std::string task,
         std::string deadline,
-        bool complete);
+        bool complete = false);
 
     void upd_task(httplib::Client& cli,
         httplib::Headers headers,
         int id,
-        std::string login,
         std::string task,
         std::string deadline,
         bool complete);

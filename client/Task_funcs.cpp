@@ -80,7 +80,7 @@ bool ActionWithServer::remove_task(httplib::Client& cli, httplib::Headers header
     return false;
 }
 
-void ActionWithServer::add_task(httplib::Client& cli, httplib::Headers headers, int id, std::string login, std::string task, std::string deadline, bool complete){
+bool ActionWithServer::add_task(httplib::Client& cli, httplib::Headers headers, std::string task, std::string deadline, bool complete){
 
     nlohmann::json add;
     add["task"] = task;
@@ -94,6 +94,7 @@ void ActionWithServer::add_task(httplib::Client& cli, httplib::Headers headers, 
     if (errors)
         if (errors->status == 201) {
             std::cout << "Task was added";
+            return true;
         } else { 
             std::cout << "Server error: " << errors->status << std::endl;         
         }
@@ -101,13 +102,13 @@ void ActionWithServer::add_task(httplib::Client& cli, httplib::Headers headers, 
         auto error_response = errors.error();
         std::cout << "Network error. Code: " << static_cast<int>(error_response) << std::endl;
     }
+    return false;
 }
 
-void ActionWithServer::upd_task(httplib::Client& cli, httplib::Headers headers, int id, std::string login, std::string task, std::string deadline, bool complete){
+void ActionWithServer::upd_task(httplib::Client& cli, httplib::Headers headers, int id, std::string task, std::string deadline, bool complete){
 
     nlohmann::json upd;
     upd["id"] = id;
-    upd["login"] = login;
     upd["task"] = task;
     upd["deadline"] = deadline;
     upd["complete"] = complete;
