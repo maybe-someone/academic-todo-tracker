@@ -2,8 +2,12 @@ import bcrypt
 from database import *
 import jwt
 import datetime
+import os
+from dotenv import load_dotenv
 
-SECRET_KEY = "super-safe-secret-key-change-me-also-i-love-pizza-and-cats"
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 
 def get_password(password: str):
