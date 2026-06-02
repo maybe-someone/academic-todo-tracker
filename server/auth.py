@@ -1,5 +1,5 @@
 import bcrypt
-from database import *
+from database import select_user_db, add_user_db
 import jwt
 import datetime
 import os

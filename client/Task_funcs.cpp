@@ -16,8 +16,8 @@ httplib::Headers ActionWithServer::reg(httplib::Client& cli, std::string login, 
 
 	if (response_token)
 		if (response_token->status == 201) {
-			std::string pizdec = nlohmann::json::parse(response_token->body)["token"];
-			std::string token = "Bearer " + pizdec;
+			std::string raw_token = nlohmann::json::parse(response_token->body)["token"];
+			std::string token = "Bearer " + raw_token;
 			std::cout << "Token was accepted\n";
 			return {{"Authorization", token}};
 		} else { 
@@ -40,8 +40,8 @@ httplib::Headers ActionWithServer::login(httplib::Client& cli, std::string login
 
 	if (response_token)
 		if (response_token->status == 200) {
-			std::string pizdec = nlohmann::json::parse(response_token->body)["access_token"];
-			std::string token = "Bearer " + pizdec;
+			std::string raw_token = nlohmann::json::parse(response_token->body)["access_token"];
+			std::string token = "Bearer " + raw_token;
 			std::cout << "Token was accepted\n";
 			return {{"Authorization", token}};
 		} else { 

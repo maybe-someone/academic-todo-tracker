@@ -1,5 +1,12 @@
 from fastapi import FastAPI, HTTPException, status, Depends
-from database import *
+from database import (
+	init_db,
+	select_task_db,
+	select_tasks_db,
+	add_task_db,
+	remover_task_db,
+	upd_task_db
+)
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from schemas import UserLogin, CreateTask, UpdateTask
@@ -20,10 +27,10 @@ app = FastAPI(lifespan = lifespan)
 
 @app.exception_handler(Exception)
 async def debug_exception_handler(request: Request, exc: Exception):
-    print("--- FULL ERROR TRACEBACK ---")
-    traceback.print_exc()
-    print("----------------------------")
-    return JSONResponse(status_code=500, content={"message": "Internal Server Error"})
+	print("--- FULL ERROR TRACEBACK ---")
+	traceback.print_exc()
+	print("----------------------------")
+	return JSONResponse(status_code=500, content={"message": "Internal Server Error"})
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 @app.post("/register", status_code=status.HTTP_201_CREATED)
@@ -32,9 +39,9 @@ def reg_user(username: UserLogin):
 		return {"status": "Registration completed!", "token": user_token_create(username.login)}
 	else:
 		raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="This login is already taken."
-        )
+			status_code=status.HTTP_409_CONFLICT,
+			detail="This login is already taken."
+		)
 
 @app.post("/login")
 def login_user(user: OAuth2PasswordRequestForm = Depends()):
@@ -42,18 +49,18 @@ def login_user(user: OAuth2PasswordRequestForm = Depends()):
 		return {"status": "Successful login!", "access_token": user_token_create(user.username), "token_type": "bearer"}
 	else:
 		raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect login or password."
-        )
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Incorrect login or password."
+		)
 
 @app.post("/tasks/add", status_code=status.HTTP_201_CREATED)
 def task_add(user: CreateTask, token: str = Depends(oauth2_scheme)):
 	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token was not accepted."
-        )
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Token was not accepted."
+		)
 	if select_user_db(token_owner):
 		add_task_db(
 			token_owner,
@@ -64,32 +71,32 @@ def task_add(user: CreateTask, token: str = Depends(oauth2_scheme)):
 		return {"task": "Task created successfully!"}
 	else:
 		raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with login '{token_owner}' does not exist. Register first."
-        )
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail=f"User with login '{token_owner}' does not exist. Register first."
+		)
 
 @app.delete("/tasks/remove")
 def remove_task(id: int, token: str = Depends(oauth2_scheme)):
 	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token was not accepted."
-        )
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Token was not accepted."
+		)
 	
 	task = select_task_db(id)
 
 	if not task:
 		raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Task with id '{id}' does not exist."
-        )
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail=f"Task with id '{id}' does not exist."
+		)
 
 	if token_owner != task[1]:
 		raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to delete this task."
-        )
+			status_code=status.HTTP_403_FORBIDDEN,
+			detail="You do not have permission to delete this task."
+		)
 
 	remover_task_db(id)
 	return {"task": "Task removed successfully!"}
@@ -101,23 +108,23 @@ def update_task(task: UpdateTask, token: str = Depends(oauth2_scheme)):
 	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token was not accepted."
-        )
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Token was not accepted."
+		)
 
 	tasks = select_task_db(task.id)
 
 	if not tasks:
 		raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Task with id '{task.id}' does not exist."
-        )
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail=f"Task with id '{task.id}' does not exist."
+		)
 
 	if token_owner != tasks[1]:
 		raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to update this task."
-        )
+			status_code=status.HTTP_403_FORBIDDEN,
+			detail="You do not have permission to update this task."
+		)
 
 	upd_task_db(task.id, task.task, task.deadline, task.complete)
 	return {"task": "Task update successfully!"}
@@ -127,9 +134,9 @@ def get_tasks(token: str = Depends(oauth2_scheme)):
 	token_owner = access(token)
 	if not token_owner:
 		raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token was not accepted."
-        )
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Token was not accepted."
+		)
 	
 	raw_tasks = select_tasks_db(token_owner)
 
@@ -149,5 +156,5 @@ def get_tasks(token: str = Depends(oauth2_scheme)):
 
 @app.get("/")
 def read_root():
-    return {"status": "Server is running"}
+	return {"status": "Server is running"}
 

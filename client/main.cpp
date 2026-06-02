@@ -3,8 +3,16 @@
 #include <iostream>
 #include <string>
 
-int main() {
-	httplib::Client cli("http://89.22.235.108:8000");
+int main(int argc, char* argv[]) {
+	std::string server_url = "http://localhost:8000";
+	// httplib::Client cli("http://89.22.235.108:8000");
+	
+	if (argc > 1) {
+		server_url = argv[1];
+	}
+
+	std::cout << "Connecting to server: " << server_url << std::endl;
+	httplib::Client cli(server_url);
 	
 	Actions actions;
 	httplib::Headers headers;
