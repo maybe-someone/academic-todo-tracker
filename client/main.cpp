@@ -4,8 +4,9 @@
 #include <string>
 
 int main(int argc, char* argv[]) {
+
+
 	std::string server_url = "http://localhost:8000";
-	// httplib::Client cli("http://89.22.235.108:8000");
 	
 	if (argc > 1) {
 		server_url = argv[1];
