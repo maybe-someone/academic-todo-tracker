@@ -17,7 +17,7 @@
 Actions::Actions () {};
 
 namespace {
-	void delimiter(int count = 20) {
+	void delimiter(int count = 10) {
 		std::cout << "\n";
 		while (count--) {
 			std::cout << "---";

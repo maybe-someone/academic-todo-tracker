@@ -5,6 +5,9 @@ from contextlib import asynccontextmanager
 from schemas import UserLogin, CreateTask, UpdateTask
 from auth import user_reg, user_auth, access, user_token_create
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+import traceback
+from fastapi import Request
+from fastapi.responses import JSONResponse
 
 
 @asynccontextmanager
@@ -15,6 +18,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan = lifespan)
 
+@app.exception_handler(Exception)
+async def debug_exception_handler(request: Request, exc: Exception):
+    print("--- FULL ERROR TRACEBACK ---")
+    traceback.print_exc()
+    print("----------------------------")
+    return JSONResponse(status_code=500, content={"message": "Internal Server Error"})
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 @app.post("/register", status_code=status.HTTP_201_CREATED)
